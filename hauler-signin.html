@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hauler Sign Up — BAGD</title>
+  <link rel="stylesheet" href="public/styles.css">
+  <script src="public/bagd-lang-theme.js"></script>
+  <script src="js/bagd-app.js"></script>
+  <style>
+    /* Popup backdrop */
+    .popup {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(6px);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    /* Popup box */
+    .popup-content {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(16px);
+      border-radius: 16px;
+      padding: 28px 24px;
+      text-align: center;
+      max-width: 360px;
+      width: 90%;
+      color: #fff;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+      animation: fadeInUp 0.3s ease;
+    }
+    .popup-content h2 { margin-bottom: 12px; font-size: 1.6rem; font-weight: 700; }
+    .popup-content p { margin-bottom: 16px; font-size: 1rem; opacity: 0.9; }
+    .popup-content button {
+      padding: 10px 20px;
+      border: none;
+      background: #2196f3;
+      color: white;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .popup-content button:hover { background: #1976d2; }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .popup-success { border: 2px solid #4caf50; }
+    .popup-error { border: 2px solid #f44336; }
+
+    /* Password toggle */
+    .password-container { position: relative; }
+    .toggle-password {
+      position: absolute; top:50%; right:10px; transform: translateY(-50%);
+      cursor: pointer; color: #555; font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html"><span class="brand-mark">⚜</span> BAGD</a>
+      <nav class="nav">
+        <a href="hauler-login.html" class="btn btn-secondary">Login</a>
+        <select id="langSelector" onchange="setLanguage(this.value)">
+          <option value="en">EN</option>
+          <option value="am">AM</option>
+          <option value="om">OM</option>
+          <option value="ti">TI</option>
+        </select>
+        <button id="themeToggle" class="icon-btn" onclick="toggleTheme()">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container" style="display:flex;justify-content:center;align-items:center;min-height:80vh;">
+      <div class="signup-container" style="width:100%;max-width:420px;">
+        <form class="signup-card card glass" id="haulerSignUpForm" enctype="multipart/form-data"
+              style="padding:32px 28px 24px 28px;box-shadow:0 8px 32px rgba(0,0,0,0.18);border-radius:18px;">
+          <h1 style="text-align:center;margin-bottom:18px;font-size:2rem;font-weight:700;letter-spacing:1px;">Hauler Sign Up</h1>
+
+          <label for="fullName">Full Name</label>
+          <input type="text" id="fullName" name="fullName" required placeholder="Your full name">
+
+          <label for="phoneNumber">Phone Number</label>
+          <input type="tel" id="phoneNumber" name="phoneNumber" required placeholder="09XXXXXXXX">
+
+          <label for="license">License Number</label>
+          <input type="text" id="license" name="license" required placeholder="License number">
+
+          <label for="licensePlate">License Plate</label>
+          <input type="text" id="licensePlate" name="licensePlate" required placeholder="Plate number">
+
+          <label for="password">Password</label>
+          <div class="password-container">
+            <input type="password" id="password" name="password" required placeholder="Choose a password">
+            <span class="toggle-password" onclick="togglePassword()">Show</span>
+          </div>
+
+          <label for="carType">Car Type</label>
+          <input type="text" id="carType" name="carType" placeholder="Car type (optional)">
+
+          <label for="carImage">Car Image (optional)</label>
+          <input type="file" id="carImage" name="carImage" accept="image/*">
+
+          <button type="submit" class="btn btn-primary" style="width:100%;margin-top:16px;font-size:1.1rem;">Sign Up</button>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <!-- Popup -->
+  <div id="popup" class="popup">
+    <div id="popupBox" class="popup-content">
+      <h2 id="popupTitle"></h2>
+      <p id="popupMessage"></p>
+      <button id="popupBtn">OK</button>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('haulerSignUpForm');
+    const popup = document.getElementById('popup');
+    const popupBox = document.getElementById('popupBox');
+    const popupTitle = document.getElementById('popupTitle');
+    const popupMessage = document.getElementById('popupMessage');
+    const popupBtn = document.getElementById('popupBtn');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(form);
+
+      fetch('hauler_signup.php', { method:'POST', body:formData })
+      .then(res => res.json())
+      .then(data => {
+        popup.style.display = 'flex';
+        popupBox.className = 'popup-content ' + (data.success ? 'popup-success' : 'popup-error');
+        popupTitle.innerText = data.success ? "✅ Signup Successful!" : "⚠️ Signup Failed";
+        popupMessage.innerText = data.success ? "You will be redirected to login." : data.message;
+        popupBtn.onclick = data.success ? () => window.location.href='hauler-login.html' : () => popup.style.display='none';
+        if(data.success) setTimeout(() => window.location.href='hauler-login.html', 3000);
+      })
+      .catch(err => {
+        popup.style.display = 'flex';
+        popupBox.className = 'popup-content popup-error';
+        popupTitle.innerText = "❌ Network Error";
+        popupMessage.innerText = "Please try again later.";
+        popupBtn.onclick = () => popup.style.display='none';
+      });
+    });
+
+    function togglePassword(){
+      const pw = document.getElementById('password');
+      const toggle = document.querySelector('.toggle-password');
+      if(pw.type==='password'){ pw.type='text'; toggle.innerText='Hide'; }
+      else{ pw.type='password'; toggle.innerText='Show'; }
+    }
+
+    function toggleTheme(){
+      var current = localStorage.getItem('theme') || 'dark';
+      var next = current==='dark'?'light':'dark';
+      setTheme(next);
+      localStorage.setItem('theme', next);
+    }
+
+    window.addEventListener('DOMContentLoaded', function() {
+      setLanguage(localStorage.getItem('lang') || 'en');
+      setTheme(localStorage.getItem('theme') || 'dark');
+      document.getElementById('langSelector').value = localStorage.getItem('lang') || 'en';
+    });
+  </script>
+</body>
+</html>

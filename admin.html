@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <script src="public/bagd-lang-theme.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BAGD — Admin</title>
+  <link rel="stylesheet" href="public/styles.css" />
+  <nav class="nav" style="display:flex; align-items:center; gap:8px;">
+    <!-- your nav links -->
+    <button id="themeToggle" class="icon-btn" aria-label="Toggle theme">🌙</button>
+    <select id="langSelect" aria-label="Language selector" style="margin-left:8px; padding:6px; border-radius:6px;">
+      <option value="en">English</option>
+      <option value="am">አማርኛ (Amharic)</option>
+      <option value="om">Afaan Oromoo (Oromo)</option>
+      <option value="ti">ትግርኛ (Tigrinya)</option>
+    </select>
+  </nav>
+  
+</head>
+<body>
+  <header class="site-header glass">
+    <div class="container header-inner">
+      <a href="index.html" class="brand"><span class="brand-mark">⚜</span><span class="brand-text">BAGD</span></a>
+    </div>
+  </header>
+  <main class="container">
+    <section class="hero glass" style="padding:14px">
+      <h1 style="margin:0 0 8px 0">Admin</h1>
+      <p class="muted" style="margin:0">Approvals, disputes, commissions, and feeds.</p>
+    </section>
+
+    <section class="cards" style="margin:14px 0">
+      <div class="card"><div class="card-body"><h3>Approvals</h3><p class="muted">3 new farmers pending.</p><div class="actions"><button class="btn btn-primary">Review</button></div></div></div>
+      <div class="card"><div class="card-body"><h3>Disputes</h3><p class="muted">1 ongoing case.</p><div class="actions"><button class="btn btn-secondary">Open</button></div></div></div>
+      <div class="card"><div class="card-body"><h3>Commissions</h3><p class="muted">Farmer 5%, Hauler 5%.</p><div class="actions"><button class="btn btn-secondary">Edit</button></div></div></div>
+    </section>
+  </main>
+  <!-- set the proxy URL (dev or production). Change to your real deployed proxy -->
+<script>
+  // For local testing:
+  // window.OLAMA_PROXY = 'http://localhost:3000/api/olama';
+  // For deployed proxy:
+  // window.OLAMA_PROXY = 'https://your-proxy.example.com/api/olama';
+  window.OLAMA_PROXY = window.OLAMA_PROXY || '/api/olama';
+</script>
+
+<!-- include the shared app script (one file used by all pages) -->
+<script src="bagd-app.js"></script>
+
+</body>
+</html>
+
+

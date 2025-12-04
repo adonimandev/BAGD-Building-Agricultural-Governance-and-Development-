@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Settings</title>
+  <link rel="stylesheet" href="public/styles.css" />
+</head>
+<body>
+  <header class="site-header glass">
+    <div class="container header-inner">
+      <a href="index.html" class="brand"><span class="brand-mark">🌾</span><span class="brand-text">AgriLink</span></a>
+    </div>
+  </header>
+  <main class="container">
+    <section class="hero glass" style="padding:14px">
+      <h1 style="margin:0 0 8px 0">Settings</h1>
+      <p class="muted" style="margin:0">Language, theme, accessibility.</p>
+    </section>
+    <section class="glass" style="padding:12px">
+      <div style="display:grid;gap:12px">
+        <div>
+          <div class="muted">Language</div>
+          <button class="btn btn-secondary" id="settingsLang">Toggle language</button>
+        </div>
+        <div>
+          <div class="muted">Theme</div>
+          <button class="btn btn-secondary" id="settingsTheme">Toggle dark/light</button>
+        </div>
+        <div>
+          <div class="muted">Accessibility</div>
+          <button class="btn btn-secondary" id="settingsBigText">Toggle big text</button>
+          <button class="btn btn-secondary" id="settingsSimple">Toggle simple mode</button>
+        </div>
+        <nav class="nav" style="display:flex; align-items:center; gap:8px;">
+          <!-- your nav links -->
+          <select id="langSelect" aria-label="Language selector" style="margin-left:8px; padding:6px; border-radius:6px;">
+            <option value="en">English</option>
+            <option value="am">አማርኛ (Amharic)</option>
+            <option value="om">Afaan Oromoo (Oromo)</option>
+            <option value="ti">ትግርኛ (Tigrinya)</option>
+          </select>
+        
+          <button id="themeToggle" class="icon-btn" aria-label="Toggle theme">🌙</button>
+        </nav>
+        
+      </div>
+    </section>
+  </main>
+  <script>
+    const settingsLang = document.getElementById('settingsLang');
+    const settingsTheme = document.getElementById('settingsTheme');
+    const settingsBigText = document.getElementById('settingsBigText');
+    const settingsSimple = document.getElementById('settingsSimple');
+    settingsLang?.addEventListener('click', ()=> document.getElementById('langToggle')?.click());
+    settingsTheme?.addEventListener('click', ()=> document.getElementById('themeToggle')?.click());
+    settingsBigText?.addEventListener('click', ()=>{
+      const html = document.documentElement; const bigger = html.style.fontSize === '19px'; html.style.fontSize = bigger ? '' : '19px';
+    });
+    settingsSimple?.addEventListener('click', ()=>{
+      document.body.classList.toggle('simple');
+    });
+  </script>
+  <!-- set the proxy URL (dev or production). Change to your real deployed proxy -->
+<script>
+  // For local testing:
+  // window.OLAMA_PROXY = 'http://localhost:3000/api/olama';
+  // For deployed proxy:
+  // window.OLAMA_PROXY = 'https://your-proxy.example.com/api/olama';
+  window.OLAMA_PROXY = window.OLAMA_PROXY || '/api/olama';
+</script>
+
+<!-- include the shared app script (one file used by all pages) -->
+<script src="bagd-app.js"></script>
+
+</body>
+</html>
+
+

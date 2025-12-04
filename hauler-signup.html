@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hauler Sign Up — BAGD</title>
+  <link rel="stylesheet" href="public/styles.css">
+  <script src="public/bagd-lang-theme.js"></script>
+  <script src="js/bagd-app.js"></script>
+  <style>
+    /* Simple theme styles */
+    body.light {
+      background: #f8f9fa;
+      color: #111;
+    }
+    body.dark {
+      background: #121212;
+      color: #eee;
+    }
+    .card {
+      background: rgba(255,255,255,0.1);
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html"><span class="brand-mark">⚜</span> BAGD</a>
+      <nav class="nav">
+        <select id="langSelector" onchange="setLanguage(this.value)">
+          <option value="en">EN</option>
+          <option value="am">AM</option>
+          <option value="om">OM</option>
+          <option value="ti">TI</option>
+        </select>
+        <button id="themeToggle" class="icon-btn" onclick="toggleTheme()">🌙</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container" style="display:flex;justify-content:center;align-items:center;min-height:80vh;">
+      <div class="signup-container" style="width:100%;max-width:420px;">
+        <form class="signup-card card glass" id="haulerSignUpForm" autocomplete="on" style="padding:32px 28px 24px 28px;box-shadow:0 8px 32px rgba(0,0,0,0.18);border-radius:18px;">
+          <h1 style="text-align:center;margin-bottom:18px;font-size:2rem;font-weight:700;letter-spacing:1px;">Hauler Sign Up</h1>
+          <label for="fullName" style="margin-bottom:6px;">Full Name</label>
+          <input type="text" id="fullName" name="fullName" required placeholder="Your full name" style="margin-bottom:16px;">
+          <label for="phoneNumber" style="margin-bottom:6px;">Phone Number</label>
+          <input type="tel" id="phoneNumber" name="phoneNumber" required placeholder="09XXXXXXXX" style="margin-bottom:16px;">
+          <label for="license" style="margin-bottom:6px;">License Number</label>
+          <input type="text" id="license" name="license" required placeholder="License number" style="margin-bottom:16px;">
+          <label for="licensePlate" style="margin-bottom:6px;">License Plate</label>
+          <input type="text" id="licensePlate" name="licensePlate" required placeholder="Plate number" style="margin-bottom:16px;">
+          <label for="carType" style="margin-bottom:6px;">Car Type</label>
+          <input type="text" id="carType" name="carType" placeholder="Car type (optional)" style="margin-bottom:16px;">
+          <label for="carImage" style="margin-bottom:6px;">Car Image (optional)</label>
+          <input type="file" id="carImage" name="carImage" accept="image/*" style="margin-bottom:18px;">
+          <button type="submit" class="btn btn-primary" style="width:100%;margin-bottom:12px;font-size:1.1rem;">Sign Up</button>
+          <div class="error" id="signupError" style="display:none;text-align:center;color:#e57373;margin-bottom:10px;">Please fill all required fields.</div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <script>
+  // ---- Define setTheme BEFORE it's called ----
+  function setTheme(theme) {
+    // apply theme as class on body
+    document.body.className = theme;
+
+    // optional: update button icon
+    var btn = document.getElementById("themeToggle");
+    if (btn) btn.textContent = theme === "dark" ? "🌙" : "☀️";
+  }
+
+  function toggleTheme() {
+    var current = localStorage.getItem('theme') || 'dark';
+    var next = current === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+    localStorage.setItem('theme', next);
+  }
+
+  window.addEventListener('DOMContentLoaded', function() {
+    setLanguage(localStorage.getItem('lang') || 'en');
+    setTheme(localStorage.getItem('theme') || 'dark');
+    document.getElementById('langSelector').value = localStorage.getItem('lang') || 'en';
+  });
+</script>
+
+</body>
+</html>

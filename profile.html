@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Profile</title>
+  <link rel="stylesheet" href="public/styles.css">
+  <style>
+    /* ------------------ Photo Preview ------------------ */
+/* ------------------ General ------------------ */
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #0b1b13;
+  color: #fff;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* ------------------ Glass Effect ------------------ */
+.glass {
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+  border: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  margin-bottom: 16px;
+}
+
+/* ------------------ Header ------------------ */
+.site-header {
+  padding: 12px 16px;
+}
+.site-header .brand {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #fff;
+  text-decoration: none;
+}
+.site-header .brand-mark {
+  margin-right: 6px;
+}
+
+/* ------------------ Hero Section ------------------ */
+.hero h1 {
+  font-size: 1.8rem;
+  margin-bottom: 4px;
+}
+.hero p.muted {
+  color: rgba(255,255,255,0.7);
+  font-size: 0.95rem;
+}
+
+/* ------------------ Form Labels & Inputs ------------------ */
+label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.95rem;
+  font-weight: 500;
+  position: relative;
+}
+label span {
+  margin-bottom: 4px;
+}
+
+input[type="text"],
+input[type="tel"],
+input[type="file"] {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.05);
+  color: #fff;
+  outline: none;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+input[type="text"]:hover,
+input[type="tel"]:hover,
+input[type="file"]:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: #36d399;
+}
+
+input[type="text"]:focus,
+input[type="tel"]:focus,
+input[type="file"]:focus {
+  border-color: #36d399;
+  box-shadow: 0 0 6px rgba(54,211,153,0.6);
+}
+
+/* ------------------ File Input Customization ------------------ */
+input[type="file"] {
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.02);
+  border: 1px dashed rgba(255,255,255,0.3);
+  text-align: left;
+}
+
+input[type="file"]::file-selector-button {
+  padding: 6px 12px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(180deg, #36d399, #0288d1);
+  color: #fff;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+input[type="file"]::file-selector-button:hover {
+  filter: brightness(1.1);
+}
+
+/* ------------------ Buttons ------------------ */
+.btn {
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: linear-gradient(180deg, #36d399, #0288d1);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+}
+
+.btn-secondary {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+/* ------------------ Spacing ------------------ */
+div[style*="height"] {
+  display: block;
+}
+
+/* ------------------ Misc ------------------ */
+.muted {
+  color: rgba(255,255,255,0.7);
+}
+
+/* ------------------ Responsive ------------------ */
+@media (max-width: 600px) {
+  .container {
+    padding: 12px;
+  }
+  .hero h1 {
+    font-size: 1.5rem;
+  }
+  .btn {
+    width: 100%;
+  }
+}
+/* ------------------ Photo Preview ------------------ */
+.photo-preview {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.05);
+  border: 1px dashed rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+  overflow: hidden;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.6);
+  transition: all 0.3s ease;
+}
+
+.photo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Optional hover effect */
+.photo-preview:hover {
+  border-color: #36d399;
+  background: rgba(255,255,255,0.1);
+}
+
+
+  </style>
+</head>
+
+  <header class="site-header glass">
+    <div class="container header-inner">
+      <a href="index.html" class="brand"><span class="brand-mark">🌾</span><span class="brand-text">BAGD</span></a>
+    </div>
+    <nav class="nav" style="display:flex; align-items:center; gap:8px;">
+      <!-- your nav links -->
+      <select id="langSelect" aria-label="Language selector" style="margin-left:8px; padding:6px; border-radius:6px;">
+        <option value="en">English</option>
+        <option value="am">አማርኛ (Amharic)</option>
+        <option value="om">Afaan Oromoo (Oromo)</option>
+        <option value="ti">ትግርኛ (Tigrinya)</option>
+      </select>
+    
+      <button id="themeToggle" class="icon-btn" aria-label="Toggle theme">🌙</button>
+    </nav>
+    
+  </header>
+  <main class="container">
+    <section class="hero glass" style="padding:14px">
+      <h1 style="margin:0 0 8px 0">Profile</h1>
+      <p class="muted" style="margin:0">Update your info and payment methods.</p>
+    </section>
+    <section class="glass" style="padding:12px">
+      <label><span>Name</span><input type="text" placeholder="Full name" /></label>
+      <div style="height:8px"></div>
+      <label><span>Phone</span><input type="tel" placeholder="09xxxxxxxx" /></label>
+      <div style="height:8px"></div>
+      <label>
+        <span>Photo</span>
+        <div class="photo-preview" id="photoPreview">
+          <span>Preview</span>
+        </div>
+        <input type="file" id="photoInput" accept="image/*" />
+      </label>
+      <div style="height:8px"></div>
+      <label><span>Payment methods</span><input type="text" placeholder="Telebirr / Card" /></label>
+      <div style="height:12px"></div>
+      <button class="btn btn-primary">Save</button>
+    </section>
+  </main>
+
+  <script>const photoInput = document.getElementById('photoInput');
+    const photoPreview = document.getElementById('photoPreview');
+    
+    photoInput.addEventListener('change', function() {
+      const file = this.files[0];
+      if(file){
+        const reader = new FileReader();
+        reader.onload = function(e){
+          photoPreview.innerHTML = `<img src="${e.target.result}" alt="Profile photo" />`;
+        }
+        reader.readAsDataURL(file);
+      } else {
+        photoPreview.innerHTML = '<span>Preview</span>';
+      }
+    });
+    </script>
+    <!-- set the proxy URL (dev or production). Change to your real deployed proxy -->
+<script>
+  // For local testing:
+  // window.OLAMA_PROXY = 'http://localhost:3000/api/olama';
+  // For deployed proxy:
+  // window.OLAMA_PROXY = 'https://your-proxy.example.com/api/olama';
+  window.OLAMA_PROXY = window.OLAMA_PROXY || '/api/olama';
+</script>
+
+<!-- include the shared app script (one file used by all pages) -->
+<script src="bagd-app.js"></script>
+
+</body>
+</html>

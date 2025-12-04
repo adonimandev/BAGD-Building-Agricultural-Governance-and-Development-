@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hauler Login — BAGD</title>
+  <link rel="stylesheet" href="public/styles.css" />
+  <script src="public/bagd-lang-theme.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html"><span class="brand-mark">⚜</span> BAGD</a>
+      <nav class="nav">
+        <a href="hauler-signin.html" class="btn btn-primary" style="width: 200px;">Sign Up</a>
+        <select id="langSelector" onchange="setLanguage(this.value)">
+          <option value="en">EN</option>
+          <option value="am">AM</option>
+          <option value="om">OM</option>
+          <option value="ti">TI</option>
+        </select>
+        <button id="themeToggle" class="icon-btn" onclick="toggleTheme()">🌙</button>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <div class="container" style="display:flex;justify-content:center;align-items:center;min-height:80vh;">
+      <div class="login-container" style="width:100%;max-width:400px;">
+        <form class="login-card card glass" id="haulerLoginForm" autocomplete="on" style="padding:32px 28px 24px 28px;box-shadow:0 8px 32px rgba(0,0,0,0.18);border-radius:18px;">
+          <h1 style="text-align:center;margin-bottom:18px;font-size:2rem;font-weight:700;letter-spacing:1px;">Hauler Login</h1>
+          <label for="loginPhone" style="margin-bottom:6px;">Phone Number</label>
+          <input type="tel" id="loginPhone" name="loginPhone" required placeholder="09XXXXXXXX" style="margin-bottom:16px;">
+          <label for="loginPassword" style="margin-bottom:6px;">Password</label>
+          <input type="password" id="loginPassword" name="loginPassword" required placeholder="Password" style="margin-bottom:18px;">
+          <button type="submit" class="btn btn-primary" style="width:100%;height:48px;margin-bottom:12px;font-size:1.15rem;">Login</button>
+          <div class="error" id="loginError" style="display:none;text-align:center;color:#e57373;margin-bottom:10px;">Invalid phone number or password</div>
+        </form>
+      </div>
+    </div>
+  </main>
+  <script>
+    document.getElementById('haulerLoginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      var phone = document.getElementById('loginPhone').value.trim();
+      var pw = document.getElementById('loginPassword').value;
+      // Demo: accept only 09XXXXXXXX and any password
+      if (/^09\d{8}$/.test(phone) && pw.length > 0) {
+        window.location.href = 'hauler.html';
+      } else {
+        document.getElementById('loginError').style.display = 'block';
+      }
+    });
+    // Language/theme sync
+    window.addEventListener('DOMContentLoaded', function() {
+      setLanguage(localStorage.getItem('lang') || 'en');
+      setTheme(localStorage.getItem('theme') || 'dark');
+      document.getElementById('langSelector').value = localStorage.getItem('lang') || 'en';
+    });
+    function toggleTheme() {
+      var current = localStorage.getItem('theme') || 'dark';
+      var next = current === 'dark' ? 'light' : 'dark';
+      setTheme(next);
+      localStorage.setItem('theme', next);
+    }
+  </script>
+</body>
+</html>

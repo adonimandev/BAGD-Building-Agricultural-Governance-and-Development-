@@ -1,0 +1,1071 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <script src="public/bagd-lang-theme.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b1b13" />
+  <title>BAGD — Market</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Ethiopic:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    /* ========= Default (Dark Mode) ========= */
+    :root {
+      --bg: #0b1b13;
+      --fg: #ffffff;
+      --surface: #16291f;
+      --border: rgba(255, 255, 255, 0.15);
+
+      --primary: #36d399;
+      --primary-hover: #28a07f;
+      --btn-text: #ffffff;
+
+      --input-bg: #1e3327;
+      --input-text: #ffffff;
+      --placeholder: rgba(255, 255, 255, 0.5);
+
+      --link: #36d399;
+      --number: #ffffff;
+    }
+
+    /* ========= Light Mode ========= */
+    [data-theme="light"] {
+      --bg: #f5f5f5;
+      --fg: #111111;
+      --surface: #ffffff;
+      --border: rgba(0, 0, 0, 0.12);
+
+      --primary: #36d399;
+      --primary-hover: #28a07f;
+      --btn-text: #111111;
+
+      --input-bg: #ffffff;
+      --input-text: #111111;
+      --placeholder: rgba(0, 0, 0, 0.4);
+
+      --link: #111111;
+      --number: #111111;
+    }
+
+    * { transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; }
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    .site-header {
+      background: var(--surface);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .container { width: min(1200px, 92%); margin-inline: auto; }
+    .header-inner { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+    .brand { font-size:1.2rem; font-weight:bold; text-decoration:none; color:var(--fg); display:flex; align-items:center; gap:8px;}
+    .glass { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px; backdrop-filter: blur(10px); box-shadow:0 4px 12px rgba(0,0,0,0.05); }
+    button, .btn, .icon-btn {
+      background: var(--primary);
+      color: var(--btn-text);
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    .btn-secondary { background: transparent; border:1px solid var(--border); color:var(--fg); }
+    .btn-outline { background: transparent; border:1px solid var(--primary); color:var(--primary); }
+
+    label { display:flex; flex-direction:column; gap:4px; font-size:0.9rem; color:var(--fg); }
+    input, select, textarea { padding:8px 10px; border-radius:8px; border:1px solid var(--border); outline:none; width:100%; background:var(--input-bg); color:var(--input-text); }
+    input::placeholder, textarea::placeholder { color:var(--placeholder); }
+    input:focus, select:focus, textarea:focus { border-color:var(--primary); box-shadow: 0 0 6px var(--primary); }
+
+    .stat-number, .price, .quantity, .count, .amount { color:var(--number); font-weight:bold; }
+
+    a { color:var(--link); text-decoration:none; transition:opacity 0.3s; }
+    a:hover { opacity:0.8; }
+
+    .hero { display:grid; grid-template-columns:1.2fr 0.8fr; gap:24px; align-items:center; padding:40px 0; }
+    .hero-text h1 { font-size:clamp(1.8rem,4vw,2.5rem); margin:0 0 16px 0; line-height:1.2; }
+    .hero-text p { margin:0 0 24px 0; font-size:1.1rem; opacity:0.8; }
+    .hero-cta { display:flex; gap:12px; }
+
+    .hero-stats { display:grid; grid-template-columns: repeat(3,1fr); gap:16px; }
+    .stat { padding:16px; border:1px solid var(--border); border-radius:12px; text-align:center; }
+    .stat-num { font-size:1.8rem; font-weight:bold; margin-bottom:4px; }
+    .stat-label { font-size:0.9rem; opacity:0.8; }
+
+    .filters { margin:24px 0; }
+    .filter-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap:16px; }
+    .content-grid { display:grid; grid-template-columns:350px 1fr; gap:24px; margin:24px 0; }
+
+    .map-panel { height:400px; display:flex; flex-direction:column; }
+    .map-placeholder { flex:1; border-radius:12px; background: linear-gradient(45deg, var(--primary) 0%, var(--primary-hover) 100%); opacity:0.7; }
+    .map-legend { display:flex; gap:16px; margin-top:12px; font-size:0.9rem; }
+    .dot { display:inline-block; width:12px; height:12px; border-radius:50%; margin-right:4px; }
+    .dot.green { background:var(--primary); }
+    .dot.blue { background:#5dd6ff; }
+
+    .cards { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap:20px; }
+    .card { border:1px solid var(--border); border-radius:12px; overflow:hidden; background:var(--surface); transition:transform 0.3s ease, box-shadow 0.3s ease; }
+    .card:hover { transform:translateY(-5px); box-shadow:0 10px 20px rgba(0,0,0,0.1); }
+    .card img { width:100%; height:160px; object-fit:cover; }
+    .card-body { padding:16px; }
+    .muted { opacity:0.7; font-size:0.9rem; margin:0 0 12px 0; }
+
+    .site-footer { margin-top:60px; padding:30px 0; border-top:1px solid var(--border); }
+    .footer-grid { display:flex; justify-content:space-between; align-items:center; }
+
+    .chatbot-icon { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; border-radius: 50%; background: var(--primary); color: var(--btn-text); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; font-size:1.5rem; }
+
+    .graphs { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:16px; }
+    .graph { height:200px; border-radius:12px; background:var(--input-bg); }
+
+    @media (max-width:900px) {
+      .hero { grid-template-columns:1fr; text-align:center; }
+      .content-grid { grid-template-columns:1fr; }
+      .hero-stats { grid-template-columns:repeat(3,1fr); }
+      .filter-grid { grid-template-columns:1fr 1fr; }
+      .header-inner { flex-direction:column; gap:12px; }
+    }
+    @media (max-width:600px) {
+      .hero-stats { grid-template-columns:1fr; }
+      .filter-grid { grid-template-columns:1fr; }
+      .graphs { grid-template-columns:1fr; }
+      .hero-cta { flex-direction:column; }
+    }
+
+    .skip-link { position:absolute; top:-40px; left:0; background:var(--primary); color:var(--btn-text); padding:8px; z-index:1000; transition:top 0.3s; }
+    .skip-link:focus { top:0; }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="brand">
+        <span class="brand-mark" aria-hidden="true">⚜</span>
+        <span class="brand-text">BAGD</span>
+      </a>
+
+      <form role="search" class="search" aria-label="Search market">
+        <input type="search" placeholder="Search crops, variety, region" aria-label="Search" />
+      </form>
+
+      <nav class="nav" style="display:flex; align-items:center; gap:8px;">
+  <a href="index.html" class="btn btn-secondary">Home</a>
+  <a href="buyer.html" class="btn btn-secondary">Buyer</a>
+  <a href="farmer.html" class="btn btn-secondary">Farmer</a>
+  <a href="hauler.html" class="btn btn-secondary">Hauler</a>
+  <button id="themeToggle" class="icon-btn" aria-label="Toggle theme">🌙</button>
+  <select id="langSelect" aria-label="Language selector" style="margin-left:8px; padding:6px; border-radius:6px; background:var(--input-bg); color:var(--input-text); border:1px solid var(--border);">
+    <option value="en">English</option>
+    <option value="am">አማርኛ (Amharic)</option>
+    <option value="om">Afaan Oromoo (Oromo)</option>
+    <option value="ti">ትግርኛ (Tigrinya)</option>
+  </select>
+  <a href="cart.html" class="icon-btn" aria-label="Cart" style="font-size:20px; text-decoration:none; margin-left:auto;">🛒</a>
+  </nav>
+
+    </div>
+  </header>
+
+  <main id="main" class="container">
+    <section class="hero">
+      <div class="hero-text">
+        <h1 data-i18n="hero_title">Fresh from the farm, fairly priced</h1>
+        <p data-i18n="hero_desc">Discover nearby crops, compare prices, and request delivery.</p>
+        <div class="hero-cta">
+          <a data-i18n="start_buying" href="buyer.html" class="btn btn-primary">Start buying</a>
+          <a data-i18n="i_am_farmer" href="farmer.html" class="btn btn-outline">hsjsnjs</a>
+        </div>
+      </div>
+
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="stat-num">1,284</div>
+          <div class="stat-label" data-i18n="active_listings">Active listings</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">ETB 42</div>
+          <div class="stat-label" data-i18n="avg_price_today">Avg price today</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">8</div>
+          <div class="stat-label" data-i18n="pickups_near_you">Pickups near you</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="glass">
+      <h2 data-i18n="market_analytics">Market analytics</h2>
+      <div class="graphs">
+        <div class="graph" id="priceChartContainer">
+          <canvas id="priceChart"></canvas>
+        </div>
+        <div class="graph" id="supplyChartContainer">
+          <canvas id="supplyChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section class="glass">
+      <h2 data-i18n="quick_stats">Quick stats</h2>
+      <div class="hero-stats">
+        <div class="stat">
+          <div class="stat-num">1,284</div>
+          <div class="stat-label" data-i18n="total_crops">Total crops available</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">312</div>
+          <div class="stat-label" data-i18n="registered_farmers">Registered farmers</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">1,950</div>
+          <div class="stat-label" data-i18n="active_buyers">Active buyers</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="filters glass">
+  <h2 data-i18n="filter_products">Filter products</h2>
+  <div class="filter-grid">
+    <label>
+      <span data-i18n="filter_crop">Crop</span>
+      <select id="filter-crop">
+        <option value="" data-i18n="all_crops">All crops</option>
+        <option value="Maize">Maize</option>
+        <option value="Teff">Teff</option>
+        <option value="Wheat">Wheat</option>
+        <option value="Coffee">Coffee</option>
+        <option value="Barley">Barley</option>
+        <option value="Sorghum">Sorghum</option>
+        <option value="Chickpea">Chickpea</option>
+      </select>
+    </label>
+    <label>
+      <span data-i18n="filter_region">Region</span>
+      <select id="filter-region">
+        <option value="" data-i18n="all_regions">All regions</option>
+        <option value="Addis Ababa">Addis Ababa</option>
+        <option value="Oromia">Oromia</option>
+        <option value="Amhara">Amhara</option>
+        <option value="Tigray">Tigray</option>
+        <option value="Sidama">Sidama</option>
+        <option value="SNNPR">SNNPR</option>
+      </select>
+    </label>
+    <label>
+      <span data-i18n="filter_price">Max price/kg</span>
+      <input type="number" id="filter-price" placeholder="ETB" min="0" />
+    </label>
+    <label>
+      <span data-i18n="filter_unit">Unit</span>
+      <select id="filter-unit">
+        <option value="kg">kg</option>
+        <option value="quintal">quintal</option>
+      </select>
+    </label>
+    <button class="btn btn-primary" id="apply-filters" style="align-self: end" data-i18n="apply_filters">Apply filters</button>
+    <button class="btn btn-secondary" id="reset-filters" style="align-self: end" data-i18n="reset_filters">Reset filters</button>
+  </div>
+</section>
+
+    <section class="content-grid">
+      <aside class="map-panel glass">
+        <div class="map-placeholder"></div>
+        <div class="map-legend">
+          <span class="dot green"></span><span>Pickups</span>
+          <span class="dot blue"></span><span>Density</span>
+        </div>
+      </aside>
+
+      <section>
+        <h2 data-i18n="available_products">Available Products</h2>
+        <div class="cards" id="products-container">
+          <!-- Loading indicator -->
+          <div class="loading" data-i18n="loading_products">Loading products...</div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <!-- Chat button -->
+  <button class="chatbot-icon" aria-label="Open chatbot" id="openChat">💬</button>
+
+  <!-- Chat modal (hidden by default) -->
+    <div id="chatModal" aria-hidden="true" style="display:none; position:fixed; right:20px; bottom:100px; width:360px; max-width:94vw; z-index:2000;">
+      <div class="glass" style="padding:8px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong data-i18n="chat_title">BAGD Assistant</strong>
+          <button id="closeChat" aria-label="Close chat" class="icon-btn" style="padding:6px 8px;">✕</button>
+        </div>
+        <div id="chatLog" style="height:300px; overflow:auto; margin-top:8px; border:1px solid var(--border); border-radius:8px; padding:8px; background:var(--input-bg)"></div>
+        <form id="chatForm" style="display:flex; gap:8px; margin-top:8px;">
+          <input id="chatInput" type="text" placeholder="Ask me about crop prices..." style="flex:1; padding:8px; border-radius:8px; border:1px solid var(--border); background:var(--input-bg); color:var(--input-text)" />
+          <button class="btn" type="submit" id="chatSend">Send</button>
+        </form>
+      </div>
+    </div>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <div class="brand">
+          <span class="brand-mark">⚜</span>
+          <span class="brand-text">BAGD</span>
+        </div>
+        <p class="muted" data-i18n="footer_desc">Market access for farmers, fair prices for all.</p>
+      </div>
+      <div class="footer-nav">
+        <a href="#">About</a>
+        <a href="#">Contact</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript to fetch and display products -->
+  <script>
+    // Function to fetch and display products
+    function loadProducts() {
+      fetch('get_products.php') // Your PHP endpoint to get all products
+        .then(response => response.json())
+        .then(data => {
+          const container = document.getElementById('products-container');
+          
+          if (data.success && data.products.length > 0) {
+            container.innerHTML = ''; // Clear loading indicator
+            
+            // Add each product as a card
+            data.products.forEach(product => {
+              const card = createProductCard(product);
+              container.appendChild(card);
+            });
+          } else {
+            container.innerHTML = '<div class="glass" style="padding:20px; text-align:center;" data-i18n="no_products">No products available at the moment.</div>';
+          }
+        })
+        .catch(error => {
+          console.error('Error loading products:', error);
+          document.getElementById('products-container').innerHTML = 
+            '<div class="glass" style="padding:20px; text-align:center; color: #dc3545;" data-i18n="error_loading_products">Error loading products. Please try again later.</div>';
+        });
+    }
+
+    // Function to create a product card
+    function createProductCard(product) {
+      const article = document.createElement('article');
+      article.className = 'card';
+      
+      // Generate gradient background based on crop type
+      const gradient = getGradientForCrop(product.crop);
+      
+      article.innerHTML = `
+        <div style="height:160px; background: ${gradient};"></div>
+        <div class="card-body">
+          <h3>${product.crop} (${product.variety})</h3>
+          <p class="muted">${product.storage_location} • ${product.weight} kg available</p>
+          <div class="price">ETB ${product.price} / kg</div>
+          <div class="actions">
+            <a class="btn btn-secondary" href="buyer.html">View</a>
+            <button class="btn btn-primary">Add to cart</button>
+          </div>
+        </div>
+      `;
+      
+      return article;
+    }
+
+    // Helper function to generate gradients based on crop type
+    function getGradientForCrop(crop) {
+      const gradients = {
+        'Maize': 'linear-gradient(45deg, #4caf50, #8bc34a)',
+        'Teff': 'linear-gradient(45deg, #795548, #9e9e9e)',
+        'Wheat': 'linear-gradient(45deg, #ffd54f, #fff176)',
+        'Coffee': 'linear-gradient(45deg, #6d4c41, #a1887f)',
+        'Barley': 'linear-gradient(45deg, #d7ccc8, #bcaaa4)',
+        'Sorghum': 'linear-gradient(45deg, #8d6e63, #bdbdbd)',
+        'Chickpea': 'linear-gradient(45deg, #ffb74d, #ffcc80)'
+      };
+      
+      return gradients[crop] || 'linear-gradient(45deg, #36d399, #28a07f)';
+    }
+
+    // Load products when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      loadProducts();
+    });
+  </script>
+
+  <!-- Inline bagd-app.js (so this single file works). You can move to bagd-app.js later. -->
+  <script>
+    /* =========================
+       BAGD app script (inline)
+       - branding update
+       - theme toggle (persist)
+       - language selector + i18n
+       - chat widget wired to getWeatherAndCropData
+       ========================= */
+
+    (function() {
+      // 1) Branding: ensure title and visible brand text
+      try {
+        if (document.title && /agrilink/i.test(document.title)) {
+          document.title = document.title.replace(/agrilink/ig, 'BAGD');
+        } else if (!/bagd/i.test(document.title)) {
+          document.title = 'BAGD — Market';
+        }
+        document.querySelectorAll('.brand-text').forEach(el => el.textContent = 'BAGD');
+      } catch (e) { console.warn('branding update error', e); }
+    })();
+
+    (function() {
+      // 2) Theme toggle persisted across pages
+      const themeToggle = document.getElementById('themeToggle');
+      const prefersDarkScheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+      let currentTheme = localStorage.getItem('bagd_theme') || (prefersDarkScheme && prefersDarkScheme.matches ? 'dark' : 'light');
+
+      function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('bagd_theme', theme);
+        if (themeToggle) {
+          themeToggle.textContent = theme === 'dark' ? '🌙' : '☀️';
+          themeToggle.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+        }
+      }
+      applyTheme(currentTheme);
+
+      if (themeToggle) {
+        themeToggle.addEventListener('click', function() {
+          currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+          applyTheme(currentTheme);
+        });
+      }
+    })();
+
+    (function() {
+      /* 3) Simple i18n for a handful of keys */
+      const translations = {
+        en: {
+          brand: 'BAGD',
+          hero_title: 'Fresh from the farm, fairly priced',
+          hero_desc: 'Discover nearby crops, compare prices, and request delivery.',
+          start_buying: 'Start buying',
+          i_am_farmer: 'I am a farmer',
+          active_listings: 'Active listings',
+          avg_price_today: 'Avg price today',
+          pickups_near_you: 'Pickups near you',
+          market_analytics: 'Market analytics',
+          quick_stats: 'Quick stats',
+          total_crops: 'Total crops available',
+          registered_farmers: 'Registered farmers',
+          active_buyers: 'Active buyers',
+          filter_products: 'Filter products',
+          filter_crop: 'Crop',
+          all_crops: 'All crops',
+          filter_region: 'Region',
+          all_regions: 'All regions',
+          filter_price: 'Max price/kg',
+          filter_unit: 'Unit',
+          apply_filters: 'Apply filters',
+          reset_filters: 'Reset filters',
+          available_products: 'Available Products',
+          loading_products: 'Loading products...',
+          no_products: 'No products available at the moment.',
+          error_loading_products: 'Error loading products. Please try again later.',
+          no_products_match: 'No products match your filters.',
+          footer_desc: 'Market access for farmers, fair prices for all.',
+          chat_title: 'BAGD Assistant',
+          chat_placeholder: 'Ask me about crop prices...'
+        },
+        am: {
+          brand: 'BAGD',
+          hero_title: 'ከእርሻ በኩል እየተደረገ ዋጋ መካከለኛ',
+          hero_desc: 'ቅርብ ያሉ ምርቶችን ይፈልጉ፣ ዋጋዎችን ይነጻጸሩ፣ እና አቅርቦት ይጠይቁ።',
+          start_buying: 'ግዢን ጀምር',
+          i_am_farmer: 'እኔ ገበሬ ነኝ',
+          active_listings: 'ንብረት ዝርያዎች',
+          avg_price_today: 'ዛሬ አማካይ ዋጋ',
+          pickups_near_you: 'ከእርስዎ አቅራቢ',
+          market_analytics: 'የገበያ ትንተና',
+          quick_stats: 'ፈጣን ስታቲስቲክስ',
+          total_crops: 'የሚገኙ ምርቶች',
+          registered_farmers: 'የተመዘገቡ ገበሬዎች',
+          active_buyers: 'ተገቢ ገዢዎች',
+          filter_products: 'ምርቶችን አሳስባ',
+          filter_crop: 'ምርት',
+          all_crops: 'ሁሉም ምርቶች',
+          filter_region: 'ክልል',
+          all_regions: 'ሁሉም ክልሎች',
+          filter_price: 'ከፍተኛ ዋጋ/ኪ.ግ',
+          filter_unit: 'መለኪያ',
+          apply_filters: 'ማጣሪያዎችን ተግባር',
+          reset_filters: 'ዳግም አስጀምር',
+          available_products: 'የሚገኙ ምርቶች',
+          loading_products: 'ምርቶችን በመጫን ላይ...',
+          no_products: 'በዚህ ጊዜ ምንም ምርቶች የሉም።',
+          error_loading_products: 'ምርቶችን ማጫን ላይ ስህተት። እባክዎን ደግመው ይሞክሩ።',
+          no_products_match: 'ምንም ምርቶች ማጣሪዎችን አይሟሟም።',
+          footer_desc: 'የገበሬዎች ገበያ መድረሻ፣ ዋጋ መካከለኛ ለሁሉም።',
+          chat_title: 'BAGD አገልጋይ',
+          chat_placeholder: 'ስለ የምርት ዋጋዎች ጠይቁ...'
+        },
+        om: {
+          brand: 'BAGD',
+          hero_title: 'Irree irraa haaraa, gatii madaalawa',
+          hero_desc: 'Midhaan dhihoo argadhu, gatii wal-bira qabi, geejjiba gaafadhu.',
+          start_buying: 'Gurgurtaa jalqabi',
+          i_am_farmer: 'Ani qotiyyoo dha',
+          active_listings: 'Tarreewwan hojii',
+          avg_price_today: 'Gatii giddugaleessa har\'aa',
+          pickups_near_you: 'Gara si dhiyaatan'
+        },
+        ti: {
+          brand: 'BAGD',
+          hero_title: 'ካብ አገዳሲ ሓዲሽ ዋጋ ዝተወሰደ',
+          hero_desc: 'ኣብ ካብ ንምርምር ዝተወሰዱ ምርታት ይፈልጉ፣ ዋጋታት ይመልከቱ።',
+          start_buying: 'ጀምር ግዚኦም',
+          i_am_farmer: 'ኣነ ኣብ እርሻ እየ',
+          active_listings: 'ኣተሓሳስባታት',
+          avg_price_today: 'መንገዲ ዋጋ ሎሚ',
+          pickups_near_you: 'ናብ ክልተኻ ተራከቡ'
+        }
+      };
+
+      const defaultLang = localStorage.getItem('bagd_lang') || 'en';
+      const langSelect = document.getElementById('langSelect');
+
+      function applyLang(lang) {
+        localStorage.setItem('bagd_lang', lang);
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+          const key = el.getAttribute('data-i18n');
+          if (translations[lang] && translations[lang][key]) {
+            el.textContent = translations[lang][key];
+          } else if (translations['en'][key]) {
+            el.textContent = translations['en'][key];
+          }
+        });
+        const chatInput = document.getElementById('chatInput');
+        if (chatInput && translations[lang] && translations[lang].chat_placeholder) {
+          chatInput.placeholder = translations[lang].chat_placeholder;
+        }
+        if (langSelect) langSelect.value = lang;
+      }
+
+      // apply initial language
+      applyLang(defaultLang);
+
+      if (langSelect) {
+        langSelect.addEventListener('change', (e) => applyLang(e.target.value));
+      }
+    })();
+
+    (function() {
+      /* 4) Chat widget: translate (Gemini) -> generate (LLaMA) -> translate back (Gemini) */
+      const openChat = document.getElementById('openChat');
+      const chatModal = document.getElementById('chatModal');
+      const closeChat = document.getElementById('closeChat');
+      const chatLog = document.getElementById('chatLog');
+      const chatForm = document.getElementById('chatForm');
+      const chatInput = document.getElementById('chatInput');
+
+      function showChat() {
+        if (!chatModal) return;
+        chatModal.style.display = 'block';
+        chatModal.setAttribute('aria-hidden', 'false');
+        chatInput && chatInput.focus();
+      }
+      function hideChat() {
+        if (!chatModal) return;
+        chatModal.style.display = 'none';
+        chatModal.setAttribute('aria-hidden', 'true');
+      }
+
+      if (openChat) openChat.addEventListener('click', showChat);
+      if (closeChat) closeChat.addEventListener('click', hideChat);
+
+      function appendMessage(content, who='bot', options={}) {
+        if (!chatLog) return null;
+        const wrapper = document.createElement('div');
+        wrapper.style.margin = '6px 0';
+        const safe = escapeHtml(content);
+        const html = (options && options.preserveLineBreaks)
+          ? safe.replace(/\n/g, '<br/>')
+          : safe;
+        wrapper.innerHTML = `<div style="font-size:0.9rem; padding:6px; border-radius:6px; ${who==='user' ? 'text-align:right' : ''}">
+          <div style="display:inline-block; max-width:85%;">${html}</div>
+        </div>`;
+        chatLog.appendChild(wrapper);
+        chatLog.scrollTop = chatLog.scrollHeight;
+        return wrapper;
+      }
+      function escapeHtml(text) {
+        return String(text).replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+      }
+
+      async function getWeatherAndCropData(amharicText) {
+        try {
+          const geminiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+          const geminiApiKey = 'AIzaSyBnWoOxTEZsuxLZF76IVy5cS3iNPxWts1k'; // Replace with your actual Google API key
+
+          const geminiHeaders = {
+            'Content-Type': 'application/json',
+            'X-goog-api-key': geminiApiKey,
+          };
+
+          // 1) Translate Amharic -> English
+          const geminiData = {
+            contents: [
+              {
+                parts: [
+                  {
+                    text: `Data:
+
+Weather in Ethiopia (Today and upcoming):
+
+Mon: 20° / 12°
+
+Tue: 19° / 13° sunny
+
+Wed: 18° / 12° sunny
+
+Thu: 18° / 12° rainy
+
+Fri: 18° / 12° cloudy
+
+Sat: 18° / 12° sunny
+
+Sun: 18° / 12° rainy
+
+Next Mon: 19° / 13°
+
+Crop Prices (Today vs Yesterday):
+
+Today: Teff = 120 birr/kg, Wheat = 100 birr/kg
+
+Yesterday: Teff = 115 birr/kg, Wheat = 95 birr/kg
+
+Instructions:
+
+Accept a user question.
+
+Respond in the same language as the user's question.
+
+Do not provide any unnecessary explanations.
+
+Do not guess or use any information beyond the data provided above.
+
+Your sole task is to answer the user's question based on the provided data.
+
+\n\n${amharicText}`,
+                  },
+                ],
+              },
+            ],
+          };
+
+          const translationResponse = await fetch(geminiUrl, {
+            method: 'POST',
+            headers: geminiHeaders,
+            body: JSON.stringify(geminiData),
+          });
+
+          const translationResult = await translationResponse.json();
+          const promptEnglish = translationResult?.candidates?.[0]?.content?.parts?.[0]?.text || amharicText;
+
+          // 2) Generate final concise answer using Gemini (no backend needed)
+          const finalPrompt = `This is the weather data for Ethiopia today:
+Mon: 20° / 12°
+Tue: 19° / 13° sunny
+Wed: 18° / 12° sunny
+Thu: 18° / 12° rainy
+Fri: 18° / 12° cloudy
+Sat: 18° / 12° sunny
+Sun: 18° / 12° rainy
+Next Mon: 19° / 13°
+
+And the price of crops today:
+TEFF: 1 killogram = 120 birr
+Wheat: 1 killogram = 100 birr
+Yesterday:
+TEFF: 1 killogram = 115 birr
+Wheat: 1 killogram = 95 birr
+
+Don't do any calculations or unnecessary explanations.
+Respond shortly, directly, and precisely based on the data above.
+Question:
+${promptEnglish}`;
+
+          const finalGenBody = {
+            contents: [
+              {
+                parts: [
+                  { text: finalPrompt }
+                ]
+              }
+            ]
+          };
+
+          const finalGenRes = await fetch(geminiUrl, {
+            method: 'POST',
+            headers: geminiHeaders,
+            body: JSON.stringify(finalGenBody),
+          });
+
+          const finalGenJson = await finalGenRes.json();
+          const finalText = finalGenJson?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+          return String(finalText).trim();
+        } catch (error) {
+          console.error('Error:', error);
+          return null;
+        }
+      }
+      if (chatForm) {
+        chatForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const text = chatInput.value.trim();
+          if (!text) return;
+          appendMessage(text, 'user', { preserveLineBreaks: true });
+          chatInput.value = '';
+
+          const typing = appendMessage('…', 'bot');
+          try {
+            const result = await getWeatherAndCropData(text);
+            if (typing) typing.remove();
+            if (result) {
+              appendMessage(result, 'bot', { preserveLineBreaks: true });
+            } else {
+              appendMessage('Sorry, I could not get a response right now.', 'bot');
+            }
+          } catch (err) {
+            if (typing) typing.remove();
+            appendMessage('Network error contacting assistant.', 'bot');
+          }
+        });
+      }
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') hideChat();
+      });
+    })();
+
+    (function() {
+      /* 5) Init charts if present (keeps your previous chart code working) */
+      // If you already have initCharts defined inline as in your original file, call it.
+      if (typeof window.initCharts === 'function') {
+        try { window.initCharts(); } catch (e) { console.warn('initCharts error', e); }
+      } else {
+        // Basic demo charts if none defined (non-blocking)
+        try {
+          const priceEl = document.getElementById('priceChart');
+          const supplyEl = document.getElementById('supplyChart');
+          if (priceEl && priceEl.getContext) {
+            const ctx = priceEl.getContext('2d');
+            new Chart(ctx, {
+              type: 'line',
+              data: {
+                labels: ['Jan','Feb','Mar','Apr','May','Jun'],
+                datasets: [{ label:'Maize Price (ETB/kg)', data:[18,22,20,25,23,28], borderColor:'#36d399', tension:0.3, fill:true,
+                  backgroundColor: function(context){ const chart = context.chart; const {ctx, chartArea} = chart; if(!chartArea) return null; const g = ctx.createLinearGradient(0,chartArea.bottom,0,chartArea.top); g.addColorStop(0,'rgba(54,211,153,0.1)'); g.addColorStop(1,'rgba(54,211,153,0.3)'); return g; }
+                }]
+              },
+              options:{ responsive:true, maintainAspectRatio:false, plugins:{ title:{ display:true, text:'Price Trends (Last 6 Months)' } } }
+            });
+          }
+          if (supplyEl && supplyEl.getContext) {
+            const ctx2 = supplyEl.getContext('2d');
+            new Chart(ctx2, {
+              type: 'bar',
+              data: {
+                labels: ['Maize','Teff','Wheat','Coffee','Barley'],
+                datasets: [
+                  { label:'Supply (tons)', data:[120,85,95,45,60], backgroundColor:'rgba(54,211,153,0.7)' },
+                  { label:'Demand (tons)', data:[135,90,110,60,50], backgroundColor:'rgba(93,214,255,0.7)' }
+                ]
+              },
+              options:{ responsive:true, maintainAspectRatio:false, plugins:{ title:{ display:true, text:'Supply vs Demand' } } }
+            });
+          }
+        } catch (e) { console.warn('chart fallback failed', e); }
+      }
+    })();
+  </script>
+  <!-- set the proxy URL (dev or production). Change to your real deployed proxy -->
+<script>
+  // For local testing:
+  // window.OLAMA_PROXY = 'http://localhost:3000/api/olama';
+  // For deployed proxy:
+  // window.OLAMA_PROXY = 'https://your-proxy.example.com/api/olama';
+  // If using a different port, update this in your HTML
+// Filter functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const filterCrop = document.getElementById('filter-crop');
+  const filterRegion = document.getElementById('filter-region');
+  const filterPrice = document.getElementById('filter-price');
+  const filterUnit = document.getElementById('filter-unit');
+  const applyFiltersBtn = document.getElementById('apply-filters');
+  const resetFiltersBtn = document.getElementById('reset-filters');
+  
+  let allProducts = []; // This will store all products
+  
+  // Fetch all products when page loads
+  fetchProducts();
+  
+  // Apply filters when button is clicked
+  applyFiltersBtn.addEventListener('click', applyFilters);
+  
+  // Reset filters
+  resetFiltersBtn.addEventListener('click', resetFilters);
+  
+  // Function to fetch products
+  function fetchProducts() {
+    // Show loading state
+    const container = document.getElementById('products-container');
+    container.innerHTML = '<div class="loading">Loading products...</div>';
+    
+    fetch('get_products.php')
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          allProducts = data.products;
+          displayProducts(allProducts);
+        } else {
+          container.innerHTML = '<div class="glass" style="padding:20px; text-align:center;" data-i18n="no_products">No products available at the moment.</div>';
+        }
+      })
+      .catch(error => {
+        console.error('Error loading products:', error);
+        container.innerHTML = '<div class="glass" style="padding:20px; text-align:center; color: #dc3545;" data-i18n="error_loading_products">Error loading products. Please try again later.</div>';
+      });
+  }
+  
+  // Function to apply filters
+  function applyFilters() {
+    const cropValue = filterCrop.value;
+    const regionValue = filterRegion.value;
+    const priceValue = filterPrice.value ? parseFloat(filterPrice.value) : null;
+    const unitValue = filterUnit.value;
+    
+    // Filter products based on criteria
+    const filteredProducts = allProducts.filter(product => {
+      // Filter by crop
+      if (cropValue && product.crop !== cropValue) return false;
+      
+      // Filter by region
+      if (regionValue && product.storage_location !== regionValue) return false;
+      
+      // Filter by price
+      if (priceValue) {
+        // Convert to quintal if needed
+        let productPrice = parseFloat(product.price);
+        if (unitValue === 'quintal') {
+          productPrice = productPrice * 100; // Convert kg price to quintal
+        }
+        
+        if (productPrice > priceValue) return false;
+      }
+      
+      return true;
+    });
+    
+    // Display filtered products
+    displayProducts(filteredProducts);
+  }
+  
+  // Function to reset filters
+  function resetFilters() {
+    filterCrop.value = '';
+    filterRegion.value = '';
+    filterPrice.value = '';
+    filterUnit.value = 'kg';
+    
+    // Display all products
+    displayProducts(allProducts);
+  }
+  
+  // Function to display products
+  function displayProducts(products) {
+    const container = document.getElementById('products-container');
+    
+    if (products.length === 0) {
+      container.innerHTML = '<div class="glass" style="padding:20px; text-align:center;" data-i18n="no_products_match">No products match your filters.</div>';
+      return;
+    }
+    
+    container.innerHTML = '';
+    
+    // Add each product as a card
+    products.forEach(product => {
+      const card = createProductCard(product);
+      container.appendChild(card);
+    });
+  }
+  
+  // Function to create a product card
+  function createProductCard(product) {
+    const article = document.createElement('article');
+    article.className = 'card';
+    
+    // Generate gradient background based on crop type
+    const gradient = getGradientForCrop(product.crop);
+    
+    article.innerHTML = `
+      <div style="height:160px; background: ${gradient};"></div>
+      <div class="card-body">
+        <h3>${product.crop} (${product.variety})</h3>
+        <p class="muted">${product.storage_location} • ${product.weight} kg available</p>
+        <div class="price">ETB ${product.price} / kg</div>
+        <div class="actions">
+          <a class="btn btn-secondary" href="buyer.html">View</a>
+          <button class="btn btn-primary">Add to cart</button>
+        </div>
+      </div>
+    `;
+    
+    return article;
+  }
+  
+  // Helper function to generate gradients based on crop type
+  function getGradientForCrop(crop) {
+    const gradients = {
+      'Maize': 'linear-gradient(45deg, #4caf50, #8bc34a)',
+      'Teff': 'linear-gradient(45deg, #795548, #9e9e9e)',
+      'Wheat': 'linear-gradient(45deg, #ffd54f, #fff176)',
+      'Coffee': 'linear-gradient(45deg, #6d4c41, #a1887f)',
+      'Barley': 'linear-gradient(45deg, #d7ccc8, #bcaaa4)',
+      'Sorghum': 'linear-gradient(45deg, #8d6e63, #bdbdbd)',
+      'Chickpea': 'linear-gradient(45deg, #ffb74d, #ffcc80)'
+    };
+    
+    return gradients[crop] || 'linear-gradient(45deg, #36d399, #28a07f)';
+  }
+});
+// Add to cart functionality for index.html
+document.addEventListener('DOMContentLoaded', function() {
+  // Update cart count on page load
+  updateCartCount();
+  
+  // Add event listeners to all "Add to cart" buttons
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('btn-primary') && e.target.textContent.includes('Add to cart')) {
+      const card = e.target.closest('.card');
+      const title = card.querySelector('h3').textContent;
+      const priceText = card.querySelector('.price').textContent;
+      const locationText = card.querySelector('.muted').textContent;
+      
+      // Extract data from card
+      const [crop, variety] = title.split('—').map(s => s.trim());
+      const price = parseFloat(priceText.match(/ETB ([\d.]+)/)[1]);
+      const [weight, location] = locationText.split('•').map(s => s.trim());
+      
+      // Create cart item
+      const cartItem = {
+        id: Date.now(), // Unique ID
+        crop: crop,
+        variety: variety,
+        price: price,
+        weight: weight,
+        storage_location: location,
+        quantity: 1
+      };
+      
+      // Add to cart
+      addToCart(cartItem);
+      
+      // Show confirmation
+      showNotification(`${crop} added to cart!`, 'success');
+    }
+  });
+});
+
+// Function to add item to cart
+function addToCart(item) {
+  const cartItems = JSON.parse(localStorage.getItem('bagd_cart')) || [];
+  
+  // Check if item already exists in cart
+  const existingItemIndex = cartItems.findIndex(i => i.crop === item.crop && i.variety === item.variety);
+  
+  if (existingItemIndex !== -1) {
+    // Update quantity if item exists
+    cartItems[existingItemIndex].quantity += 1;
+  } else {
+    // Add new item to cart
+    cartItems.push(item);
+  }
+  
+  // Save to localStorage
+  localStorage.setItem('bagd_cart', JSON.stringify(cartItems));
+  
+  // Update cart count in UI
+  updateCartCount();
+}
+
+// Function to update cart count in UI
+function updateCartCount() {
+  const cartItems = JSON.parse(localStorage.getItem('bagd_cart')) || [];
+  const cartCount = document.getElementById('cart-count');
+  
+  if (cartCount) {
+    cartCount.textContent = cartItems.reduce((total, item) => total + item.quantity, 0);
+  }
+}
+
+// Function to show notification
+function showNotification(message, type = 'info') {
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 16px;
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--fg);
+    border-left: 4px solid ${type === 'success' ? '#28a745' : '#36d399'};
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 1000;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+  `;
+  notification.textContent = message;
+  
+  document.body.appendChild(notification);
+  
+  // Show notification
+  setTimeout(() => {
+    notification.style.transform = 'translateX(0)';
+  }, 100);
+  
+  // Hide notification after 3 seconds
+  setTimeout(() => {
+    notification.style.transform = 'translateX(100%)';
+    setTimeout(() => {
+      document.body.removeChild(notification);
+    }, 300);
+  }, 3000);
+}
+</script>
+
+<!-- include the shared app script (one file used by all pages) -->
+
+
+</body>
+</html>

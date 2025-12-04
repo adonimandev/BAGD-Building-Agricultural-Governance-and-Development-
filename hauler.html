@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <script src="public/bagd-lang-theme.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BAGD — Hauler</title>
+  <link rel="stylesheet" href="public/styles.css" />
+</head>
+<body>
+  <header class="site-header glass">
+    <div class="container header-inner">
+      <a href="index.html" class="brand"><span class="brand-mark">⚜</span><span class="brand-text">BAGD</span></a>
+      <nav class="nav">
+        <a class="btn btn-secondary" href="index.html">Sign out</a>
+        <a class="btn btn-secondary" href="buyer.html">Buyer</a>
+        <a class="btn btn-secondary" href="farmer.html">Farmer</a>
+        <a class="btn btn-secondary" href="hauler.html">Hauler</a>
+        <a class="btn btn-secondary" href="cart.html">Cart</a>
+        <a class="btn btn-secondary" href="hauler-login.html">Login</a>
+        <a class="btn btn-primary" href="hauler-signin.html">Sign Up</a>
+      </nav>
+      <nav class="nav" style="display:flex; align-items:center; gap:8px;">
+        <select id="langSelect" aria-label="Language selector" style="margin-left:8px; padding:6px; border-radius:6px;">
+          <option value="en">English</option>
+          <option value="am">አማርኛ (Amharic)</option>
+          <option value="om">Afaan Oromoo (Oromo)</option>
+          <option value="ti">ትግርኛ (Tigrinya)</option>
+        </select>
+        <button id="themeToggle" class="icon-btn" aria-label="Toggle theme">🌙</button>
+      </nav>
+    </div>
+  </header>
+  <main class="container">
+    <section class="hero glass" style="padding:14px">
+      <h1 style="margin:0 0 8px 0" id="haulerDashboardTitle">Hauler dashboard</h1>
+      <p class="muted" style="margin:0" id="haulerDashboardDesc">Toggle availability, see nearby jobs, and navigate.</p>
+    </section>
+    <!-- Modal for full map -->
+    <div class="modal" id="modalFullMap" aria-hidden="true" style="display:none; align-items:center; justify-content:center;">
+      <div class="modal-card" style="max-width:900px; width:95vw; height:80vh;">
+        <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center;">
+          <strong>Full Route Map</strong>
+          <button class="close-btn" onclick="document.getElementById('modalFullMap').style.display='none'">Close</button>
+        </div>
+        <div class="modal-body" style="height:calc(80vh - 60px);">
+          <iframe src="mapping/index.html" style="width:100%; height:100%; border:none;" title="Full Route Map"></iframe>
+        </div>
+      </div>
+    </div>
+    <section class="content-grid">
+      <aside class="glass" style="padding:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <div>
+            <div class="muted" id="statusLabel">Status</div>
+            <div class="stat-num" id="statusText">Available</div>
+          </div>
+          <button class="btn btn-primary" id="statusToggle">Toggle</button>
+        </div>
+        <div style="height:12px"></div>
+        <div class="stat" id="earningsStatBox"><div class="stat-num" id="earningsStatNum">ETB 3,260</div><div class="stat-label" id="earningsLabel">Earnings</div></div>
+        <div style="height:10px"></div>
+        <button class="btn btn-secondary" id="openEarnings">View earnings</button>
+      </aside>
+      <section>
+        <div class="map-panel glass">
+          <div id="embeddedMapPanel" style="border-radius:12px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.08); margin-bottom:10px; transition:box-shadow 0.3s; cursor:pointer;">
+            <iframe src="mapping/index.html" style="width:100%; height:400px; border:none; display:block; border-radius:12px;" title="Route Map" id="embeddedMapIframe"></iframe>
+          </div>
+          <div class="map-legend" style="margin-top:8px;"><span class="dot green"></span><span>Pickups</span><span class="dot blue"></span><span>Routes</span></div>
+        </div>
+        <div style="height:12px"></div>
+        <div class="glass" style="padding:12px" id="availableJobs">
+  <h2>Available jobs</h2>
+  <div id="jobsContainer"></div>
+</div>
+        <div style="height:12px"></div>
+        <div class="glass" style="padding:12px">
+    <h2 style="margin:0 0 8px 0" id="activeJobTitle">Active job</h2>
+          <p class="muted" id="activeJobInfo">No active job</p>
+          <div class="actions"><button class="btn btn-primary" id="startJob">Start</button><button class="btn btn-secondary" id="completeJob">Complete</button></div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div class="modal" id="modalEarnings" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-header"><strong>Earnings</strong><button class="close-btn" data-close="modalEarnings">Close</button></div>
+      <div class="modal-body">
+        <div class="stat"><div class="stat-num">ETB 3,260</div><div class="stat-label">Total</div></div>
+        <div style="height:10px"></div>
+        <table class="table">
+          <thead><tr><th>Date</th><th>Route</th><th>Fare</th></tr></thead>
+          <tbody>
+            <tr><td>2025-06-01</td><td>Oromia → Addis</td><td>ETB 320</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+<script>
+  const haulerName = "Dawit"; // dynamically set based on login
+
+function loadJobs(){
+    fetch('get_jobs.php')
+    .then(res=>res.json())
+    .then(data=>{
+        const container = document.getElementById('jobsContainer');
+        container.innerHTML = '';
+        if(data.success){
+            data.jobs.forEach(job=>{
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.marginBottom = '10px';
+                card.innerHTML = `
+                  <div class="card-body">
+                    <h3>Pickup: ${job.pickup_location} → ${job.dropoff_location}</h3>
+                    <p class="muted">Order: ${job.order_id}</p>
+                    <div class="actions">
+                      <button class="btn btn-primary acceptJob" data-order="${job.order_id}">Accept</button>
+                    </div>
+                  </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+    });
+}
+
+document.addEventListener('click', function(e){
+    if(e.target.classList.contains('acceptJob')){
+        const order_id = e.target.getAttribute('data-order');
+        fetch('accept_job.php',{
+            method:'POST',
+            headers:{'Content-Type':'application/x-www-form-urlencoded'},
+            body:`order_id=${order_id}&hauler_name=${haulerName}`
+        })
+        .then(res=>res.json())
+        .then(data=>{
+            alert(data.message);
+            loadJobs(); // refresh list
+        });
+    }
+});
+
+setInterval(loadJobs, 5000); // refresh every 5s
+loadJobs();
+  function syncEarningsStatColor() {
+    var theme = document.documentElement.getAttribute('data-theme');
+    var statNum = document.getElementById('earningsStatNum');
+    var statLabel = document.getElementById('earningsLabel');
+    var statBox = document.getElementById('earningsStatBox');
+    if (statNum) statNum.style.color = theme === 'light' ? '#222' : '#eee';
+    if (statLabel) statLabel.style.color = theme === 'light' ? '#222' : '#eee';
+    if (statBox) statBox.style.background = theme === 'light' ? '#fff' : '#222';
+    if (statBox) statBox.style.borderRadius = '8px';
+    if (statBox) statBox.style.boxShadow = theme === 'light' ? '0 1px 4px rgba(0,0,0,0.07)' : '0 1px 4px rgba(0,0,0,0.25)';
+  }
+  document.addEventListener('DOMContentLoaded', syncEarningsStatColor);
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'bagd_theme') syncEarningsStatColor();
+  });
+  document.getElementById('themeToggle').addEventListener('click', function() {
+    setTimeout(syncEarningsStatColor, 10);
+  });
+</script>
+</html>
+<!-- set the proxy URL (dev or production). Change to your real deployed proxy -->
+
+<!-- include the shared app script (one file used by all pages) -->
+<script src="js/bagd-app.js"></script>
+
+<script>
+  // Make embedded map panel clickable to open modal
+  document.addEventListener('DOMContentLoaded', function() {
+    var mapPanel = document.getElementById('embeddedMapPanel');
+    if (mapPanel) {
+      mapPanel.addEventListener('click', function() {
+        document.getElementById('modalFullMap').style.display = 'flex';
+      });
+      mapPanel.addEventListener('mouseover', function() {
+        mapPanel.style.boxShadow = '0 4px 16px rgba(54,211,153,0.15)';
+      });
+      mapPanel.addEventListener('mouseout', function() {
+        mapPanel.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+      });
+    }
+  });
+    // Make dashboard map panel clickable to open modal
+  document.addEventListener('DOMContentLoaded', function() {
+    var mapPanel = document.getElementById('dashboardMapPanel');
+    if (mapPanel) {
+      mapPanel.addEventListener('click', function() {
+        document.getElementById('modalFullMap').style.display = 'flex';
+      });
+    }
+  });
+</script>
+
+
+
+</html>
+
+
